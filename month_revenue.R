@@ -11,11 +11,11 @@
 
 #看套件使用主要還是先看例子比較好
 
+library(plyr)
 
-
-setwd("C:/Users/Neil/Documents/backtest_in_R/revenue_backtest") # 設定工作目錄
+setwd("C:/Users/Neil/Documents/git-repos/backtest_in_R/revenue_backtest") # 設定工作目錄
 library(data.table)
-library(dplyr)
+#library(dplyr)
 library(readr) #讀取檔案必備
 library(ggplot2) # 畫圖使用
 library(lubridate) #轉換日期使用 
@@ -30,13 +30,14 @@ TSMC = read.table("2330TSMC_stockprice_2010-2019.txt" , header = TRUE ,encoding 
 colnames(TSMC) = c("證券代碼","公司名稱","年月日","調整收盤價","成交張數")
 TSMC$年月日 = ymd(TSMC$年月日)
 TSMC$調整收盤價 = as.numeric(TSMC$調整收盤價)
-TSMC$TSMC_60MA = ma(TSMC$調整收盤價 , order = 60) 
-#TTR_60MA = SMA(TSMC$調整收盤價, n = 60) #用TTR套件製作MA  #n是期間的意思，有成功
+#TSMC$TSMC_60MA = ma(TSMC$調整收盤價 , order = 60) 用forecast寫的
+TSMC$TSMC_60MA = SMA(TSMC$調整收盤價, n = 60) #用TTR套件製作MA  #n是期間的意思，有成功
 TSMC_stock_picture = ggplot(TSMC , aes(x = 年月日)) +  # 學一下ggpolt用法 ，第一個要式dataframe 後面是裡面的資料
                     geom_line(aes(y = 調整收盤價)) +
                     geom_line(aes(y = TSMC_60MA))  #未完待續，請參閱教學
 TSMC_stock_picture
-
+TSMC$前一天的收盤價 = shift(TSMC$調整收盤價,n = 1)
+TSMC$單日漲幅 = (TSMC$調整收盤價-TSMC$前一天的收盤價)/TSMC$前一天的收盤價
 
 #####tej_closed 計算多股60MA #####
 stock_price = data.table(read.table("TEJ_closed_2020_2021.txt", header = TRUE ))
@@ -73,7 +74,19 @@ MA_stock_price = MA_function(stock_price,ndays = 60)
 #####月營收指標計算#####
 #我想要月營收成長率
 
-stock_price = data.table(read.csv("stock_price_closed_MA.csv", header = TRUE ))
-revenue_data = data.table(read.table("month_revenue_2020_2021.txt" ,header = TRUE ,encoding = "mbcs" , dec = "\t"))
+#stock_price = data.table(read.csv("stock_price_closed_MA.csv", header = TRUE ))
+revenue_data = data.table(read.csv("month_revenue_2020_2021.txt" ,header = TRUE ,encoding = "mbcs"))
+colnames(revenue_data) = c("證券代碼","公司名稱","年月","營收發布日","單月營收")
+revenue_data$營收發布日= ymd(revenue_data$營收發布日)
+#revenue_data$年月 = ymd(revenue_data$年月)
+# as.numeric(revenue_data$證券代碼)
+str(revenue_data)
 
-df = stock_price[]
+# df = stock_price[]
+
+revenue_data = ddply(revenue_data,c("證券代碼"),.fun = function(x){
+  transform(x, 上月營收 = with(x, shift(x$單月營收, n = 1)))
+}
+  )
+revenue_data$單月營收成長率 = round((revenue_data$單月營收 - revenue_data$上月營收)/ revenue_data$上月營收,digits = 2)
+
