@@ -90,3 +90,4 @@ revenue_data = ddply(revenue_data,c("證券代碼"),.fun = function(x){
   )
 revenue_data$單月營收成長率 = round((revenue_data$單月營收 - revenue_data$上月營收)/ revenue_data$上月營收,digits = 2)
 
+
