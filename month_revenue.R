@@ -42,6 +42,7 @@ TSMC$單日漲幅 = (TSMC$調整收盤價-TSMC$前一天的收盤價)/TSMC$前�
 #####tej_closed 計算多股60MA #####
 stock_price = data.table(read.table("TEJ_closed_2020_2021.txt", header = TRUE ))
 colnames(stock_price) = c("證券代碼","公司名稱","年月日","調整收盤價","成交張數")
+stock_price$年月日 = ymd(stock_price$年月日)
 
 #媽的終於成功惹，這邊是在跑MA之前，先生成一個資料集，裡面有每支股票的出現天數，再用semi_join方法，把小於60日的資料跟原資料比對
 
@@ -90,4 +91,9 @@ revenue_data = ddply(revenue_data,c("證券代碼"),.fun = function(x){
   )
 revenue_data$單月營收成長率 = round((revenue_data$單月營收 - revenue_data$上月營收)/ revenue_data$上月營收,digits = 2)
 
+stock_tmp = stock_price[stock_price$日 >= 11 ]
 
+stock_price$月 = day(stock_price$年月日)
+stock_price$日 = day(stock_price$年月日)
+?day
+str(stock_price)
