@@ -15,7 +15,7 @@ library(plyr)
 
 setwd("C:/Users/Neil/Documents/git-repos/backtest_in_R/revenue_backtest") # 設定工作目錄
 library(data.table)
-#library(dplyr)
+library(dplyr)
 library(readr) #讀取檔案必備
 library(ggplot2) # 畫圖使用
 library(lubridate) #轉換日期使用 
