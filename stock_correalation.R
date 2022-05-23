@@ -90,7 +90,7 @@ table_cor_dis = table_cor[!duplicated(table_cor$年月),]
 
 
 #畫圖
-cor_picture = ggplot(table_cor , aes(x = 年月日)) +
+cor_picture = ggplot(table_cor_dis , aes(x = 年月日)) +
   geom_line(aes(y = cor)) + #未完待續，請參閱教學
   geom_line(aes(y = mounth_return_rate))
 cor_picture
