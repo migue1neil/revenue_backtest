@@ -54,7 +54,7 @@ delete_MA = function(stock_price_dataframe, ndays){  #設計成函數，要導�
   forMA_stock_price = semi_join(stock_price,ndays_stock_price, by = "證券代碼") #比較資料，如果左邊的ID有出現在右邊的話，將他留下。
   return (forMA_stock_price) #回傳dataframe出去
 }
-# new_stock_price = delete_MA(stock_price, 60) #到時候可以在函數裡面在加一個這個，用來移除
+#new_stock_price = delete_MA(stock_price, 60) #到時候可以在函數裡面在加一個這個，用來移除
 #成功了
 # dfc = ddply(new_stock_price, c("證券代碼","公司名稱") , 
 #             .fun= function(x){
